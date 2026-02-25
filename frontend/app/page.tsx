@@ -32,6 +32,8 @@ export default function Home() {
   const [tileUsers, setTileUsers] = useState<Map<string, string>>(new Map());
   const [stats, setStats] = useState({ totalGreen: 0, totalTiles: GRID_WIDTH * GRID_HEIGHT });
   const lastGreenifyRef = useRef<{ x: number; y: number; position: [number, number, number] } | null>(null);
+  const clickFeedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const txStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [leaderboardRefreshKey, setLeaderboardRefreshKey] = useState<string | null>(null);
   const { isConnected, address } = useAccount();
   const { price } = useContractPrice();
@@ -48,6 +50,11 @@ export default function Home() {
   }, [address, tileUsers]);
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => () => {
+    if (clickFeedbackTimeoutRef.current) clearTimeout(clickFeedbackTimeoutRef.current);
+    if (txStatusTimeoutRef.current) clearTimeout(txStatusTimeoutRef.current);
+  }, []);
 
   const addGreenTile = useCallback(
     (x: number, y: number, position: [number, number, number], userAddress?: string) => {
@@ -126,6 +133,9 @@ export default function Home() {
     const last = lastGreenifyRef.current;
     if (!last) return;
     lastGreenifyRef.current = null;
+    setTxStatus("confirmed");
+    if (txStatusTimeoutRef.current) clearTimeout(txStatusTimeoutRef.current);
+    txStatusTimeoutRef.current = setTimeout(() => setTxStatus(null), 2500);
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
     fetch("/api/green-tiles", { cache: "no-store", method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -169,22 +179,50 @@ export default function Home() {
     if (leaderboardRefreshKey) refreshStats();
   }, [leaderboardRefreshKey, refreshStats]);
 
+  useEffect(() => {
+    if (writeError) setTxStatus(null);
+  }, [writeError]);
+
+  const noContract = !GREEN_WORLD_ADDRESS;
   const handleTileClick = useCallback(
     (x: number, y: number, position: [number, number, number]) => {
-      if (!isConnected || !price || isPending || !address) return;
-      // Cüzdanı hemen aç: önce tx tetikle, optimistic UI'ı sonraki tick'te yap (donma olmasın)
+      const showFeedback = (msg: string) => {
+        if (clickFeedbackTimeoutRef.current) clearTimeout(clickFeedbackTimeoutRef.current);
+        setClickFeedback(msg);
+        clickFeedbackTimeoutRef.current = setTimeout(() => setClickFeedback(null), 3000);
+      };
+      if (!isConnected || !address) {
+        showFeedback("Connect wallet to plant a tree");
+        return;
+      }
+      if (isPending) {
+        showFeedback("Transaction in progress…");
+        return;
+      }
+      if (!price || price === BigInt(0)) {
+        const isProd = typeof window !== "undefined" && !window.location.hostname.match(/^localhost$/i);
+        showFeedback(isProd ? "Loading price… (check Base network & RPC)" : "Loading price…");
+        return;
+      }
+      if (noContract) {
+        showFeedback("Contract not configured");
+        return;
+      }
+      setTxStatus("pending");
       greenify(x, y, price);
       queueMicrotask(() => addGreenTile(x, y, position, address));
     },
-    [isConnected, price, isPending, address, greenify, addGreenTile]
+    [isConnected, price, isPending, address, greenify, addGreenTile, noContract]
   );
 
-  const noContract = !GREEN_WORLD_ADDRESS;
   const isMobile = useIsMobile();
   const { isMiniApp } = useMiniapp();
   const useMobileLayout = isMobile || isMiniApp === true;
   const [mobileTab, setMobileTab] = useState<"home" | "leaderboard" | "activity">("home");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [clickFeedback, setClickFeedback] = useState<string | null>(null);
+  const [txStatus, setTxStatus] = useState<"pending" | "confirmed" | null>(null);
+  const txStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   return (
     <main className={`app-shell ${useMobileLayout ? "app-shell-mobile-layout" : ""}`}>
@@ -245,6 +283,30 @@ export default function Home() {
       )}
 
       {/* İçerik: mobilde tab’a göre, masaüstünde sadece globe */}
+      {clickFeedback && (
+        <div className="click-feedback" role="status">
+          {clickFeedback}
+        </div>
+      )}
+
+      {/* Transaction status — haritanın altında, yeşil */}
+      {txStatus && (
+        <div className={`tx-status-bar tx-status-bar--${txStatus}`} role="status" aria-live="polite">
+          {txStatus === "pending" && (
+            <>
+              <span className="tx-status-bar__spinner" aria-hidden />
+              <span className="tx-status-bar__text">Transaction pending confirmation</span>
+            </>
+          )}
+          {txStatus === "confirmed" && (
+            <>
+              <span className="tx-status-bar__icon tx-status-bar__icon--check" aria-hidden>✓</span>
+              <span className="tx-status-bar__text">Transaction confirmed</span>
+            </>
+          )}
+        </div>
+      )}
+
       <div className={`globe-wrap ${useMobileLayout ? "globe-wrap-mobile" : ""}`}>
         {!useMobileLayout ? (
           <WorldScene
