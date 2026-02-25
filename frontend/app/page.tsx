@@ -195,6 +195,10 @@ export default function Home() {
         showFeedback("Connect wallet to plant a tree");
         return;
       }
+      if (noContract) {
+        showFeedback("Contract not configured");
+        return;
+      }
       if (isPending) {
         showFeedback("Transaction in progress…");
         return;
@@ -202,10 +206,6 @@ export default function Home() {
       if (!price || price === BigInt(0)) {
         const isProd = typeof window !== "undefined" && !window.location.hostname.match(/^localhost$/i);
         showFeedback(isProd ? "Loading price… (check Base network & RPC)" : "Loading price…");
-        return;
-      }
-      if (noContract) {
-        showFeedback("Contract not configured");
         return;
       }
       setTxStatus("pending");
@@ -222,7 +222,6 @@ export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [clickFeedback, setClickFeedback] = useState<string | null>(null);
   const [txStatus, setTxStatus] = useState<"pending" | "confirmed" | null>(null);
-  const txStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   return (
     <main className={`app-shell ${useMobileLayout ? "app-shell-mobile-layout" : ""}`}>
