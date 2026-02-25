@@ -1,0 +1,20 @@
+# Env (gizli key'ler git'e eklenmesin)
+.env
+.env.local
+.env.*.local
+
+# Dependencies & build
+node_modules/
+.next/
+out/
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
