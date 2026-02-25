@@ -27,7 +27,7 @@ export async function GET() {
       ogTitle: "Green World",
       ogDescription: "Greenify the world on Base — click to plant trees.",
       ogImageUrl: LOGO_URL,
-      noindex: process.env.NODE_ENV !== "production",
+      noindex: false,
     },
   };
 
