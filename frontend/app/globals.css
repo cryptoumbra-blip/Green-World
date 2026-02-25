@@ -754,7 +754,7 @@ body {
   height: 5px;
 }
 
-/* Mobil panel – Leaderboard / Activity tam ekran */
+/* Mobil panel – Leaderboard / Activity tam ekran (logonun altında başlasın) */
 .mobile-panel {
   position: absolute;
   inset: 0;
@@ -762,6 +762,10 @@ body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   background: rgba(10, 10, 20, 0.5);
+}
+
+.app-shell-mobile-layout .mobile-panel {
+  padding-top: 92px; /* Logo + header’dan aşağı, çakışmasın */
 }
 
 .mobile-panel .leaderboard,
