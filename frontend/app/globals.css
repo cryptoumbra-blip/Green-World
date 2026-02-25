@@ -82,23 +82,29 @@ body {
   }
 }
 
-/* Transaction status bar — haritanın altında, yeşil */
+/* Transaction status bar — harita genişliğinde, ortada (sol/sağ butonları kapatmaz) */
 .tx-status-bar {
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 45;
+  width: 100%;
+  max-width: 68vw;
+  min-width: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   padding: 14px 20px;
   padding-bottom: max(14px, env(safe-area-inset-bottom));
+  margin-bottom: 12px;
   background: rgba(10, 10, 20, 0.92);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(126, 231, 135, 0.2);
+  border: 1px solid rgba(126, 231, 135, 0.2);
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
   color: #7ee787;
   font-size: 0.9rem;
   font-weight: 500;
@@ -108,7 +114,9 @@ body {
 
 .app-shell-mobile-layout .tx-status-bar {
   bottom: 64px;
+  margin-bottom: 8px;
   padding-bottom: 14px;
+  max-width: 88vw;
 }
 
 .tx-status-bar__text {
@@ -151,11 +159,11 @@ body {
 @keyframes tx-status-bar-in {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateX(-50%) translateY(12px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
   }
 }
 
