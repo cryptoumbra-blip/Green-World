@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback, useState, useRef } from "react";
+import { useMemo, useCallback, useState, useRef, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -65,6 +65,8 @@ type WorldSceneProps = {
   userTileKeys?: Set<string>;
   onTileClick: (x: number, y: number, position: [number, number, number]) => void;
   disabled?: boolean;
+  /** Mobil veya miniapp: kamera başlangıçta daha uzak (dünya ekrana sığar) */
+  mobileOrMiniapp?: boolean;
 };
 
 const TARGET_RADIUS = 1;
@@ -169,6 +171,7 @@ function TinyTree({
   color: string;
   renderOrder: number;
 }) {
+  const groupRef = useRef<THREE.Group>(null);
   const normal = useMemo(() => position.clone().normalize(), [position.x, position.y, position.z]);
   const quat = useMemo(
     () =>
@@ -182,8 +185,16 @@ function TinyTree({
   const capY = TRUNK_HEIGHT;
   const foliageY = TRUNK_HEIGHT + FOLIAGE_HEIGHT / 2;
 
+  useEffect(() => {
+    const g = groupRef.current;
+    if (!g) return;
+    g.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) (child as THREE.Mesh).raycast = () => {};
+    });
+  }, []);
+
   return (
-    <group position={position} quaternion={quat} scale={scale}>
+    <group ref={groupRef} position={position} quaternion={quat} scale={scale}>
       <mesh position={[0, trunkY, 0]} renderOrder={renderOrder}>
         <cylinderGeometry args={[TRUNK_RADIUS, TRUNK_RADIUS * 1.1, TRUNK_HEIGHT, 6]} />
         <meshBasicMaterial color={TRUNK_COLOR} depthTest={true} depthWrite={false} />
@@ -252,6 +263,7 @@ export function WorldScene({
   userTileKeys,
   onTileClick,
   disabled,
+  mobileOrMiniapp = false,
 }: WorldSceneProps) {
   const handleGlobeClick = useCallback(
     (point: THREE.Vector3) => {
@@ -278,6 +290,7 @@ export function WorldScene({
         onGlobeClick={handleGlobeClick}
         autoRotate={autoRotate}
         autoRotateSpeed={autoRotateSpeed}
+        mobileOrMiniapp={mobileOrMiniapp}
       />
       <div className="globe-controls">
         <button
@@ -303,6 +316,11 @@ export function WorldScene({
   );
 }
 
+const CAMERA_Z_DESKTOP = 2.2;
+const CAMERA_Z_MOBILE = 3.5;
+const MIN_DISTANCE_DESKTOP = 1.65;
+const MIN_DISTANCE_MOBILE = 2.8;
+
 function CanvasWrapper({
   greenTiles,
   exactPositions,
@@ -310,6 +328,7 @@ function CanvasWrapper({
   onGlobeClick,
   autoRotate,
   autoRotateSpeed,
+  mobileOrMiniapp = false,
 }: {
   greenTiles: Set<string>;
   exactPositions: Map<string, [number, number, number]>;
@@ -317,8 +336,11 @@ function CanvasWrapper({
   onGlobeClick: (point: THREE.Vector3) => void;
   autoRotate: boolean;
   autoRotateSpeed: number;
+  mobileOrMiniapp?: boolean;
 }) {
   const [radius, setRadius] = useState(1);
+  const cameraZ = mobileOrMiniapp ? CAMERA_Z_MOBILE : CAMERA_Z_DESKTOP;
+  const minDist = mobileOrMiniapp ? MIN_DISTANCE_MOBILE : MIN_DISTANCE_DESKTOP;
 
   const onRadius = useCallback((r: number) => {
     setRadius((prev) => (r > 0 && r !== prev ? r : prev));
@@ -327,7 +349,7 @@ function CanvasWrapper({
   return (
     <div style={{ width: "100%", height: "100%", background: "transparent" }}>
       <Canvas
-        camera={{ position: [0, 0, 2.2], fov: 50 }}
+        camera={{ position: [0, 0, cameraZ], fov: 50 }}
         gl={{ antialias: true, alpha: true }}
         style={{ width: "100%", height: "100%", display: "block", background: "transparent" }}
       >
@@ -344,7 +366,7 @@ function CanvasWrapper({
         <OrbitControls
           enableZoom
           enablePan={false}
-          minDistance={1.65}
+          minDistance={minDist}
           maxDistance={6}
           autoRotate={autoRotate}
           autoRotateSpeed={autoRotateSpeed}

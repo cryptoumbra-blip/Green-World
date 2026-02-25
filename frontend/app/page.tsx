@@ -314,6 +314,7 @@ export default function Home() {
             userTileKeys={userTileKeys}
             onTileClick={handleTileClick}
             disabled={!isConnected || isPending || noContract}
+            mobileOrMiniapp={false}
           />
         ) : useMobileLayout && mobileTab === "home" ? (
           <>
@@ -323,6 +324,7 @@ export default function Home() {
               userTileKeys={userTileKeys}
               onTileClick={handleTileClick}
               disabled={!isConnected || isPending || noContract}
+              mobileOrMiniapp={true}
             />
             {mounted && (
               <div className="mobile-home-progress">

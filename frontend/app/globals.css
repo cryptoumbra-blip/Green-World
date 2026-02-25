@@ -715,18 +715,41 @@ body {
   bottom: 80px;
 }
 
+/* Mobil/miniapp: World greenified küçük, sağ üst (harita üstüne gelmez) */
 .mobile-home-progress {
   position: fixed;
   top: 88px;
-  left: 16px;
+  right: 16px;
+  left: auto;
   z-index: 20;
   padding: 0;
-  max-width: 280px;
+  max-width: 140px;
   pointer-events: none;
 }
 
 .mobile-home-progress .global-progress {
   pointer-events: auto;
+  padding: 8px 10px;
+  min-width: unset;
+  border-radius: 10px;
+}
+
+.mobile-home-progress .global-progress-header {
+  margin-bottom: 6px;
+  gap: 2px;
+}
+
+.mobile-home-progress .global-progress-label {
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+.mobile-home-progress .global-progress-value {
+  font-size: 0.75rem;
+}
+
+.mobile-home-progress .global-progress-track {
+  height: 5px;
 }
 
 /* Mobil panel – Leaderboard / Activity tam ekran */
