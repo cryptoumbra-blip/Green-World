@@ -36,6 +36,42 @@ Open [http://localhost:3000](http://localhost:3000), connect wallet, click a til
 
 **Sharp background:** For a crisp full-screen space background, replace `frontend/public/space-bg.jpg` with an image at least **1920×1080** (or 2560×1440 for large/Retina screens). The default image is 720×1280 and will look soft when scaled.
 
+## Deploy on Vercel
+
+Repo kökünde Next.js yok; uygulama **`frontend/`** içinde. 404 almamak için:
+
+1. Vercel Dashboard → Projeni seç → **Settings** → **General**
+2. **Root Directory** alanında **`frontend`** yaz (veya "Edit" → `frontend` seç) → **Save**
+3. **Environment Variables** bölümüne ekle (Production):  
+   `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`, `NEXT_PUBLIC_APP_URL` (örn. `https://greenworld-ten.vercel.app`), `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+4. **Redeploy** (Deployments → son deploy → ⋮ → Redeploy)
+
+Contract adresi kodda varsayılan; Vercel env’e eklemen gerekmez.
+
+### Canlıda tıklama / cüzdan açılmıyorsa
+
+Localde çalışıp canlıda çalışmıyorsa genelde şunlardan biri eksiktir:
+
+1. **Vercel Environment Variables** (Settings → Environment Variables, Production):
+   - **`NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`** — [WalletConnect Cloud](https://cloud.walletconnect.com) proje ID’si. Yoksa cüzdan modalı açılmayabilir.
+   - **`NEXT_PUBLIC_APP_URL`** — Canlı site URL’i (örn. `https://greenworld-ten.vercel.app`). Farcaster / redirect için.
+
+2. **WalletConnect Cloud → Allowed Origins:**  
+   Proje ayarlarında canlı domain’i ekle (örn. `https://greenworld-ten.vercel.app`). Yoksa tarayıcı güvenlik politikası yüzünden bağlantı reddedilir.
+
+3. **Ağ:** Kullanıcı cüzdanında **Base** ağı seçili olmalı; contract Base’de.
+
+4. **“Loading price…” sürekli görünüyorsa:** Contract’tan `price` okunamıyor (RPC / ağ). Base RPC erişilebilir mi kontrol et; gerekirse farklı bir public RPC dene.
+
+Değişiklikten sonra Vercel’da **Redeploy** yap.
+
+### GitHub'a push (değişiklikleri yansıtmak)
+
+`git push` 403 veriyorsa (farklı hesap): GitHub'da Personal access token oluşturup şu komutu kullanın (TOKEN_BURAYA yerine token):
+```bash
+git push https://cryptoumbra-blip:TOKEN_BURAYA@github.com/cryptoumbra-blip/Green-World.git main
+```
+
 ## Contract
 
 - **GreenWorld.sol**

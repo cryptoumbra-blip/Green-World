@@ -16,7 +16,7 @@ const WorldScene = dynamic(() => import("@/components/WorldScene").then((m) => (
   ),
 });
 import { useContractPrice } from "@/hooks/useContractPrice";
-import { GREEN_WORLD_ADDRESS, GRID_WIDTH, GRID_HEIGHT } from "@/lib/config";
+import { GREEN_WORLD_ADDRESS, GRID_WIDTH, GRID_HEIGHT, BASE_CHAIN_ID } from "@/lib/config";
 import { Leaderboard } from "@/components/Leaderboard";
 import { GlobalProgress } from "@/components/GlobalProgress";
 import { RecentActivity } from "@/components/RecentActivity";
@@ -35,7 +35,7 @@ export default function Home() {
   const clickFeedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const txStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [leaderboardRefreshKey, setLeaderboardRefreshKey] = useState<string | null>(null);
-  const { isConnected, address } = useAccount();
+  const { isConnected, address, chainId } = useAccount();
   const { price } = useContractPrice();
   const { greenify, isPending, writeError, hash, isSuccess } = useGreenify();
 
@@ -186,13 +186,17 @@ export default function Home() {
   const noContract = !GREEN_WORLD_ADDRESS;
   const handleTileClick = useCallback(
     (x: number, y: number, position: [number, number, number]) => {
-      const showFeedback = (msg: string) => {
+      const showFeedback = (msg: string, durationMs = 2000) => {
         if (clickFeedbackTimeoutRef.current) clearTimeout(clickFeedbackTimeoutRef.current);
         setClickFeedback(msg);
-        clickFeedbackTimeoutRef.current = setTimeout(() => setClickFeedback(null), 3000);
+        clickFeedbackTimeoutRef.current = setTimeout(() => setClickFeedback(null), durationMs);
       };
       if (!isConnected || !address) {
-        showFeedback("Connect wallet to plant a tree");
+        showFeedback("Connect your wallet");
+        return;
+      }
+      if (chainId !== undefined && chainId !== BASE_CHAIN_ID) {
+        showFeedback("Please switch to Base network");
         return;
       }
       if (noContract) {
@@ -205,14 +209,14 @@ export default function Home() {
       }
       if (!price || price === BigInt(0)) {
         const isProd = typeof window !== "undefined" && !window.location.hostname.match(/^localhost$/i);
-        showFeedback(isProd ? "Loading price… (check Base network & RPC)" : "Loading price…");
+        showFeedback(isProd ? "Loading price… (check Base network & RPC)" : "Loading price…", 3000);
         return;
       }
       setTxStatus("pending");
       greenify(x, y, price);
       queueMicrotask(() => addGreenTile(x, y, position, address));
     },
-    [isConnected, price, isPending, address, greenify, addGreenTile, noContract]
+    [isConnected, chainId, price, isPending, address, greenify, addGreenTile, noContract]
   );
 
   const isMobile = useIsMobile();
@@ -313,7 +317,7 @@ export default function Home() {
             exactPositions={exactPositions}
             userTileKeys={userTileKeys}
             onTileClick={handleTileClick}
-            disabled={!isConnected || isPending || noContract}
+            disabled={isPending || noContract}
             mobileOrMiniapp={false}
           />
         ) : useMobileLayout && mobileTab === "home" ? (
@@ -323,7 +327,7 @@ export default function Home() {
               exactPositions={exactPositions}
               userTileKeys={userTileKeys}
               onTileClick={handleTileClick}
-              disabled={!isConnected || isPending || noContract}
+              disabled={isPending || noContract}
               mobileOrMiniapp={true}
             />
             {mounted && (

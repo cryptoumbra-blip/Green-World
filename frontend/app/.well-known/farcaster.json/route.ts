@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://green-world.vercel.app";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://greenworld.fun";
 const LOGO_URL = `${BASE_URL}/logo.png`;
 
 export async function GET() {

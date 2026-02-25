@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://green-world.vercel.app";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://greenworld.fun";
 const LOGO_URL = `${BASE_URL}/logo.png`;
 
 export async function generateMetadata(): Promise<Metadata> {
