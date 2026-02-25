@@ -6,9 +6,9 @@ const LOGO_URL = `${BASE_URL}/logo.png`;
 export async function GET() {
   const manifest = {
     accountAssociation: {
-      header: "",
-      payload: "",
-      signature: "",
+      header: "eyJmaWQiOjI4NDAwNTMsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHhmNzZEQkFhRkU3RTVBODAyYTk4OWZlOTExMjlmMEZFZmQ2MDA3ODM4In0",
+      payload: "eyJkb21haW4iOiJncmVlbndvcmxkLmZ1biJ9",
+      signature: "0Q2Vrr4ygigOwJOkMCfcHGw2H3QrxlTd3FDxDyANVzFIdfqv4FK4RRIHuN9lE7OZK//W6DbXQjZpyxJAMgyNvRw=",
     },
     miniapp: {
       version: "1",
