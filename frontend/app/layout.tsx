@@ -44,6 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     other: {
       "fc:miniapp": JSON.stringify(fcMiniapp),
+      "base:app_id": "699f4ba5d8f84b13f8523055",
     },
   };
 }
