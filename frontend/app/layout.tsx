@@ -29,6 +29,15 @@ export async function generateMetadata(): Promise<Metadata> {
       apple: "/logo.png",
     },
     openGraph: {
+      type: "website",
+      url: BASE_URL,
+      siteName: "Green World",
+      title: "Green World",
+      description: "Greenify the world on Base — click to plant trees.",
+      images: [{ url: LOGO_URL, width: 1200, height: 630, alt: "Green World" }],
+    },
+    twitter: {
+      card: "summary_large_image",
       title: "Green World",
       description: "Greenify the world on Base — click to plant trees.",
       images: [LOGO_URL],
