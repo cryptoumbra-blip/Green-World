@@ -716,10 +716,10 @@ body {
   bottom: 80px;
 }
 
-/* Mobil/miniapp: World greenified üst orta (logo ile hamburger arası) */
+/* Mobil/miniapp: World greenified en üstte, ortada (haritanın üstüne gelmez) */
 .mobile-home-progress {
   position: fixed;
-  top: 88px;
+  top: 14px;
   left: 50%;
   transform: translateX(-50%);
   right: auto;
