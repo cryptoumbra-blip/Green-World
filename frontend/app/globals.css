@@ -703,6 +703,7 @@ body {
 .globe-wrap-mobile {
   padding-bottom: 72px;
   min-height: 100vh;
+  margin-top: -20px;
 }
 
 @media (max-width: 767px) {
@@ -715,15 +716,16 @@ body {
   bottom: 80px;
 }
 
-/* Mobil/miniapp: World greenified küçük, sağ üst (harita üstüne gelmez) */
+/* Mobil/miniapp: World greenified üst orta (logo ile hamburger arası) */
 .mobile-home-progress {
   position: fixed;
   top: 88px;
-  right: 16px;
-  left: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  right: auto;
   z-index: 20;
   padding: 0;
-  max-width: 140px;
+  max-width: 160px;
   pointer-events: none;
 }
 
