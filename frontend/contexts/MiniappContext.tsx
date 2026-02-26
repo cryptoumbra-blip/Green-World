@@ -9,8 +9,6 @@ type MiniappContextValue = {
 
 const MiniappContext = createContext<MiniappContextValue>({ isMiniApp: null });
 
-const ADD_MINIAPP_PROMPTED_KEY = "greenworld_add_miniapp_prompted";
-
 export function MiniappProvider({ children }: { children: React.ReactNode }) {
   const [isMiniApp, setIsMiniApp] = useState<boolean | null>(null);
   const addMiniAppTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -24,23 +22,10 @@ export function MiniappProvider({ children }: { children: React.ReactNode }) {
           setIsMiniApp(value);
           if (value) {
             sdk.actions.ready();
-            // Sayfa ilk açıldığında "Add to Farcaster" onayı göster (oturumda bir kez)
-            if (typeof sessionStorage !== "undefined" && !sessionStorage.getItem(ADD_MINIAPP_PROMPTED_KEY)) {
-              addMiniAppTimeoutRef.current = setTimeout(() => {
-                sdk.actions
-                  .addMiniApp()
-                  .then(() => {
-                    try {
-                      sessionStorage.setItem(ADD_MINIAPP_PROMPTED_KEY, "1");
-                    } catch {}
-                  })
-                  .catch(() => {
-                    try {
-                      sessionStorage.setItem(ADD_MINIAPP_PROMPTED_KEY, "1");
-                    } catch {}
-                  });
-              }, 800);
-            }
+            // Her miniapp açılışında addMiniApp çağır; client zaten ekliyse modal göstermez, kaldırdıysa tekrar sorar
+            addMiniAppTimeoutRef.current = setTimeout(() => {
+              sdk.actions.addMiniApp().catch(() => {});
+            }, 800);
           }
         }
       })
