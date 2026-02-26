@@ -24,6 +24,7 @@ import { WalletConnectOrAddress } from "@/components/WalletConnectOrAddress";
 import { useGreenTilesRealtime } from "@/hooks/useGreenTilesRealtime";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useMiniapp } from "@/contexts/MiniappContext";
+import { sdk } from "@farcaster/miniapp-sdk";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -278,6 +279,22 @@ export default function Home() {
                 </button>
               </div>
               <div className="mobile-drawer-body">
+                {isMiniApp === true && (
+                  <div className="mobile-drawer-add-favorites">
+                    <button
+                      type="button"
+                      className="mobile-drawer-add-favorites-btn"
+                      onClick={() => {
+                        sdk.actions.addMiniApp().catch(() => {});
+                      }}
+                    >
+                      ★ Add to Favorites
+                    </button>
+                    <p className="mobile-drawer-add-favorites-hint">
+                      Save Green World to your Farcaster or Base app home for quick access.
+                    </p>
+                  </div>
+                )}
                 <WalletConnectOrAddress />
               </div>
             </div>
