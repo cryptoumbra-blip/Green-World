@@ -53,6 +53,11 @@ body {
   }
 }
 
+/* Miniapp (Farcaster/Base): kendi chrome’ları var, site header gizle */
+body.is-miniapp .site-header {
+  display: none;
+}
+
 /* Tıklama geri bildirimi (cüzdan yok / price yükleniyor) */
 .click-feedback {
   position: fixed;
@@ -801,6 +806,10 @@ body {
 
 .app-shell-mobile-layout .mobile-panel {
   padding-top: 92px; /* Logo + header’dan aşağı, çakışmasın */
+}
+
+body.is-miniapp .app-shell-mobile-layout .mobile-panel {
+  padding-top: 16px; /* Miniapp’ta header yok */
 }
 
 .mobile-panel .leaderboard,
