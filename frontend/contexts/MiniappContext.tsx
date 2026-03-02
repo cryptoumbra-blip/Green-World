@@ -11,9 +11,9 @@ const MiniappContext = createContext<MiniappContextValue>({ isMiniApp: null });
 
 /** Miniapp iframe bazen geç yanıt veriyor; önce 600ms, iframe’deyse 1200ms ile tekrar dene */
 async function detectMiniApp(): Promise<boolean> {
-  let value = await sdk.isInMiniApp(600);
+  let value = await sdk.isInMiniApp();
   if (!value && typeof window !== "undefined" && window.self !== window.top) {
-    value = await sdk.isInMiniApp(1200);
+    value = await sdk.isInMiniApp();
   }
   return value;
 }

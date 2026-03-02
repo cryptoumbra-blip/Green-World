@@ -1,6 +1,7 @@
 "use client";
 
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useSendTransaction, useWaitForTransactionReceipt } from "wagmi";
+import { encodeFunctionData, concat } from "viem";
 import { Attribution } from "ox/erc8021";
 import { greenWorldAbi } from "@/lib/contract";
 import { GREEN_WORLD_ADDRESS } from "@/lib/config";
@@ -11,7 +12,7 @@ const BUILDER_CODE_DATA_SUFFIX = Attribution.toDataSuffix({
 });
 
 export function useGreenify() {
-  const { writeContract, data: hash, error: writeError, isPending } = useWriteContract();
+  const { sendTransaction, data: hash, error: writeError, isPending } = useSendTransaction();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
   const greenify = (x: number, y: number, priceWei: bigint) => {
@@ -19,13 +20,16 @@ export function useGreenify() {
       console.error("NEXT_PUBLIC_GREEN_WORLD_ADDRESS not set");
       return;
     }
-    writeContract({
-      address: GREEN_WORLD_ADDRESS,
+    const calldata = encodeFunctionData({
       abi: greenWorldAbi,
       functionName: "greenify",
       args: [BigInt(x), BigInt(y)],
+    });
+    const dataWithSuffix = concat([calldata as `0x${string}`, BUILDER_CODE_DATA_SUFFIX]);
+    sendTransaction({
+      to: GREEN_WORLD_ADDRESS,
+      data: dataWithSuffix,
       value: priceWei,
-      dataSuffix: BUILDER_CODE_DATA_SUFFIX,
     });
   };
 
