@@ -1,9 +1,14 @@
 "use client";
 
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { parseEther } from "viem";
+import { Attribution } from "ox/erc8021";
 import { greenWorldAbi } from "@/lib/contract";
 import { GREEN_WORLD_ADDRESS } from "@/lib/config";
+
+/** Base Builder Code – sıralamada çıkmak için (bc_c9erpd2u) */
+const BUILDER_CODE_DATA_SUFFIX = Attribution.toDataSuffix({
+  codes: ["bc_c9erpd2u"],
+});
 
 export function useGreenify() {
   const { writeContract, data: hash, error: writeError, isPending } = useWriteContract();
@@ -20,6 +25,7 @@ export function useGreenify() {
       functionName: "greenify",
       args: [BigInt(x), BigInt(y)],
       value: priceWei,
+      dataSuffix: BUILDER_CODE_DATA_SUFFIX,
     });
   };
 
